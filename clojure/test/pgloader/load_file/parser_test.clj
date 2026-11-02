@@ -569,3 +569,37 @@
                    WITH on error resume next;")]
       (is (:ok result) (str "Parse failed: " (:error result)))
       (is (nil? (get-in result [:ok :with-options :on-error-stop]))))))
+
+;; ── create no indexes / no foreign keys ──────────────────────────────────────
+
+(deftest test-create-no-indexes-and-no-foreign-keys
+  (testing "both options parse and set the flags to false, not true"
+    (let [result (parser/parse-string
+                  "LOAD DATABASE FROM mssql://u:p@host:1433/src
+                   INTO postgresql://u:p@host:5432/dst
+                   WITH data only, create no indexes, no foreign keys;")
+          opts   (get-in result [:ok :with-options])]
+      (is (:ok result) (str "Parse failed: " (:error result)))
+      (is (true? (:data-only opts)))
+      (is (false? (:create-indexes opts)))
+      (is (false? (:foreign-keys opts)))))
+
+  (testing "the positive forms still set the flags to true"
+    (let [result (parser/parse-string
+                  "LOAD DATABASE FROM mssql://u:p@host:1433/src
+                   INTO postgresql://u:p@host:5432/dst
+                   WITH create indexes, foreign keys;")
+          opts   (get-in result [:ok :with-options])]
+      (is (:ok result) (str "Parse failed: " (:error result)))
+      (is (true? (:create-indexes opts)))
+      (is (true? (:foreign-keys opts)))))
+
+  (testing "create no tables is not affected"
+    (let [result (parser/parse-string
+                  "LOAD DATABASE FROM mssql://u:p@host:1433/src
+                   INTO postgresql://u:p@host:5432/dst
+                   WITH create no tables, create no indexes;")
+          opts   (get-in result [:ok :with-options])]
+      (is (:ok result) (str "Parse failed: " (:error result)))
+      (is (true? (:create-no-tables opts)))
+      (is (false? (:create-indexes opts))))))

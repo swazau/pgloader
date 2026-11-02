@@ -361,6 +361,8 @@
             :single-reader       [:multiple-readers false]
             :identifier-case     (first (second inner))
             :no-reset-sequences  [:reset-sequences false]
+            :create-no-indexes   [:create-indexes false]
+            :no-foreign-keys     [:foreign-keys false]
             :drop-schema         [:drop-schema true]
             :reindex             [:reindex true]
             :preserve-index-names [:preserve-index-names true]
