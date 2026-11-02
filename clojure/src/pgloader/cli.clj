@@ -135,7 +135,7 @@
 
 (defn- print-version
   []
-  (println "pgloader v4.0.0")
+  (println "pgloader v4.0.0-fk")
   (System/exit 0))
 
 (defn- print-encodings
